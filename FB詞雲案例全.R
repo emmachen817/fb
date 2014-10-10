@@ -1,57 +1,57 @@
-setwd("E:\\±MÃDr±Ğ¾Ç\\???¦Ñ???\\1.Facebook???¤ª®×¨Ò") #±×½u­n§ï¦¨\\©Î¬O/
+setwd("E:\\å°ˆé¡Œ\\R\\Textmining\\Facebookè©é›²æ¡ˆä¾‹\\å¤©è åº§") #æ–œç·šè¦æ”¹æˆ\\æˆ–æ˜¯/ #æ–œç·šè¦æ”¹æˆ\\æˆ–æ˜¯/
 library(Rfacebook)
 library(tmcn)
 library(tm)
 library(Rwordseg)
 library(wordcloud)
-####²Ä³¡¤À¨Bª¦¤å#######################################################################
+####ç¬¬ä¸€éƒ¨åˆ†æ­¥çˆ¬æ–‡#######################################################################
 load("fb_oauth")
-#»s§@¥DÃD(´M§ä­n°µªº¯»µ·±M­¶)
-page1 <- getPage(page="star.star.08", n = 100, token = fb_oauth, feed=TRUE)#·j´M´X½gµo¤å
+#è£½ä½œä¸»é¡Œ(å°‹æ‰¾è¦åšçš„ç²‰çµ²å°ˆé )
+page1 <- getPage(page="star.star.08", n = 100, token = fb_oauth, feed=TRUE)#æœå°‹å¹¾ç¯‡ç™¼æ–‡
 list1 <- list()
 
 for (i in 1:nrow(page1)) {
   list1[[i]] <- getPost(post = page1$id[i], token = fb_oauth, n = 80)
   Sys.sleep(abs(rnorm(1, 1, 0.5)))}
-#n=­nÅª¦h¤Ö¯»µ·¼gªº(¦^ÂĞ)
-#Sys.sleep¨t²Î¤º«Øªºsleep¸ê®Æ¡A¤À¹j·j´M®É¶¡¡A¤£µM§O¤H¥i¯à·|¥H¬°¬OÀb«È
+#n=è¦è®€å¤šå°‘ç²‰çµ²å¯«çš„(å›è¦†)
+#Sys.sleepç³»çµ±å…§å»ºçš„sleepè³‡æ–™ï¼Œåˆ†éš”æœå°‹æ™‚é–“ï¼Œä¸ç„¶åˆ¥äººå¯èƒ½æœƒä»¥ç‚ºæ˜¯é§­å®¢
 list2 <- sapply(list1, FUN = function(X) {res <- X$comments;res$post_id <- X$post$id;res})
-#¯d¨¥ id «öÆg¦¸¼Æ
+#ç•™è¨€ id æŒ‰è®šæ¬¡æ•¸
 list3 <- list2[sapply(list2, length) > 1]
-#±Nlist2¤¤¤å¦rªø«×­n¤j©ó1
+#å°‡list2ä¸­æ–‡å­—é•·åº¦è¦å¤§æ–¼1
 comment1 <- do.call("rbind", list3)
-#±Nlist3ÅÜ¦¨ªí³æ
+#å°‡list3è®Šæˆè¡¨å–®
 write.csv(page1, file = "postScorpio.csv", row.names = FALSE)
 write.csv(comment1, file = "commentScorpio.csv", row.names = FALSE)
 
-####²Ä¤G³¡¤À»s§@µü¶³#######################################################################
+####ç¬¬äºŒéƒ¨åˆ†è£½ä½œè©é›²#######################################################################
 post1 <- read.csv("postScorpio.csv", stringsAsFactors = FALSE)
-#Åª¨úcsvÀÉ¡A­Y³]true·|±N¤å¦rÅÜ¼Æ¦r=>¶Ã½X
+#è®€å–csvæª”ï¼Œè‹¥è¨­trueæœƒå°‡æ–‡å­—è®Šæ•¸å­—=>äº‚ç¢¼
 post1 <- post1[!is.na(post1$message), ]
-#§R°£ªÅ®æ©ÎªÅ¦æ
+#åˆªé™¤ç©ºæ ¼æˆ–ç©ºè¡Œ
 words1 <- segmentCN(post1$message)
-#·|§â¤@¬q¦r¡A¦Û¦æ¤À¬q¡Asegment¬O¬q¸¨ªº·N«ä
+#æœƒæŠŠä¸€æ®µå­—ï¼Œè‡ªè¡Œåˆ†æ®µï¼Œsegmentæ˜¯æ®µè½çš„æ„æ€
 words1 <- unlist(words1)
-#Â²¤Æ
+#ç°¡åŒ–
 words1 <- gsub("[A-z]", "", words1)
-#²M°£post1¤¤ªº­^¤å
+#æ¸…é™¤post1ä¸­çš„è‹±æ–‡
 words1 <- words1[nchar(words1) > 1]
-#³]©w©T©wªø«×(¦Ü¤Ö¤j©ó1)
+#è¨­å®šå›ºå®šé•·åº¦(è‡³å°‘å¤§æ–¼1)
 table1 <- table(words1)
-#³]¤@­Ótable
+#è¨­ä¸€å€‹table
 wordsDf1 <- data.frame(WORD = names(table1), FREQ = as.vector(table1), stringsAsFactors = FALSE)
-#wordsDf1 <- data.frame¬O°µ¦¨¼Æ¾Ú®Øªº·N«ä¡Afreq ¤å¦r¥X²{ÀW²v
+#wordsDf1 <- data.frameæ˜¯åšæˆæ•¸æ“šæ¡†çš„æ„æ€ï¼Œfreq æ–‡å­—å‡ºç¾é »ç‡
 pdf(file = "postlover.pdf", family = "CNS1")
-#¥HpdfÀÉ§e²{¡Afamily = "CNS1":central nervous system:¤¤¼Ï¯«¸g¨t²Îªºªí¦¡¤è¦¡¡A¬O§Q¥Î³oºØªí¥Ü¤è¦¡¥h½s±Æªº
+#ä»¥pdfæª”å‘ˆç¾ï¼Œfamily = "CNS1":central nervous system:ä¸­æ¨ç¥ç¶“ç³»çµ±çš„è¡¨å¼æ–¹å¼ï¼Œæ˜¯åˆ©ç”¨é€™ç¨®è¡¨ç¤ºæ–¹å¼å»ç·¨æ’çš„
 wordcloud(wordsDf1$WORD, wordsDf1$FREQ, col = rainbow(length(wordsDf1$FREQ)))
-#¤å¦r ÀW²v ÃC¦â(°w¹ïÀW²v°Ï¤À:±m­i)
+#æ–‡å­— é »ç‡ é¡è‰²(é‡å°é »ç‡å€åˆ†:å½©è™¹)
 wordcloud(wordsDf1$WORD, wordsDf1$FREQ,min.freq=2,random.order=F,ordered.colors=F,colors = rainbow(length(wordsDf1$FREQ)))
 wordcloud(wordsDf1$WORD, wordsDf1$FREQ,min.freq=5,random.order=F,ordered.colors=F,colors = rainbow(length(wordsDf1$FREQ)))
-dev.off()#¸Ë¸mÃö³¬;¤W­±¥u¬O±NpdfÀÉ¥Í¦¨¥¼¥]§t¤º®e»İ¥[¤W¦¹«ü¥O±N¤º®eÄÀ¥X
+dev.off()#è£ç½®é—œé–‰;ä¸Šé¢åªæ˜¯å°‡pdfæª”ç”ŸæˆæœªåŒ…å«å…§å®¹éœ€åŠ ä¸Šæ­¤æŒ‡ä»¤å°‡å…§å®¹é‡‹å‡º
 
 comment1 <- read.csv("commentScorpio.csv", stringsAsFactors = FALSE)
 words2 <- segmentCN(comment1$message)
-#¯»µ·¸ê®Æ
+#ç²‰çµ²è³‡æ–™
 words2 <- unlist(words2)
 words2 <- gsub("[A-z]", "", words2)
 words2 <- words2[nchar(words2) > 1]
@@ -63,156 +63,156 @@ wordcloud(wordsDf2$WORD, wordsDf2$FREQ, col = rainbow(length(wordsDf2$FREQ)))
 wordcloud(wordsDf2$WORD, wordsDf2$FREQ,min.freq=5,random.order=F,ordered.colors=F,colors = rainbow(length(wordsDf2$FREQ)))
 dev.off()
 
-####²Ä¤T³¡¤À¼W¥[µü»P§R´îµü#######################################################################
-#¥H¯»µ·¦^À³ªº¸ê®Æ¬°¨Ò#
+####ç¬¬ä¸‰éƒ¨åˆ†å¢åŠ è©èˆ‡åˆªæ¸›è©#######################################################################
+#ä»¥ç²‰çµ²å›æ‡‰çš„è³‡æ–™ç‚ºä¾‹#
 comment1 <- read.csv("commentScorpio.csv", stringsAsFactors = FALSE)
 
-#·s¼Wµü#
-insertedwords <- c("¤ÑÃÈ®y" )
-#insertedwords·s¼Wµü¡A·s¼W"»¯ÃÃ¶¯"¤@µü¡A¤£¥[3¦r·|³Q©î¶}
+#æ–°å¢è©#
+insertedwords <- c("å¤©è åº§" )
+#insertedwordsæ–°å¢è©ï¼Œæ–°å¢"è¶™è—¤é›„"ä¸€è©ï¼Œä¸åŠ 3å­—æœƒè¢«æ‹†é–‹
 insertWords(toTrad(iconv(insertedwords, "big5", "UTF-8"), TRUE))
-#big5:ÁcÅé½s½X¡FUTF-8:¥N½X§e²{¤è¦¡
+#big5:ç¹é«”ç·¨ç¢¼ï¼›UTF-8:ä»£ç¢¼å‘ˆç¾æ–¹å¼
 
-#Â_µü#
+#æ–·è©#
 d.corpus1<- segmentCN(comment1$message)
 d.corpus <- Corpus(VectorSource(d.corpus1 ))
-#«Øºc¦V¶q¬°¿é¤J·½¡Aºc¦¨¤å³¹
+#å»ºæ§‹å‘é‡ç‚ºè¼¸å…¥æºï¼Œæ§‹æˆæ–‡ç« 
 
-#¥h°£¤£»İ­nªº¦r#
-myStopWords <- c(stopwordsCN(), "¯uªº","«¢«¢«¢","¤À¨É","¦]¬°", "¤ñ¸û", "³o¼Ë", "¥Ø«e", "©Ò¥H", "Ä±±o","ÅÜ¦¨","³o­Ó","¨S¦³","¤@­Ó","¤ÑÃÈ®y","ÃÈ¤l","¥ş¤å","¥i¥H","¥L­Ì","25","¤ÀªR","¦Û¤v","³ßÅw","§Ú­Ì","¼w°ê","ªü®Ú§Ê")
-#tmcn¬O¤j³°¶}µo¡Atm¥H¤ÎRwordseg¬°­^¤åªº
-#stopwordsCN¥´¦b¤U¤è¡A¥i¥H¬İ¨ì¤w¦s¦bªºµü(§Ú¬İ¤£¨ìQ__Q)
+#å»é™¤ä¸éœ€è¦çš„å­—#
+myStopWords <- c(stopwordsCN(), "çœŸçš„","å“ˆå“ˆå“ˆ","åˆ†äº«","å› ç‚º", "æ¯”è¼ƒ", "é€™æ¨£", "ç›®å‰", "æ‰€ä»¥", "è¦ºå¾—","è®Šæˆ","é€™å€‹","æ²’æœ‰","ä¸€å€‹","å¤©è åº§","è å­","å…¨æ–‡","å¯ä»¥","ä»–å€‘","25","åˆ†æ","è‡ªå·±","å–œæ­¡","æˆ‘å€‘","å¾·åœ‹","é˜¿æ ¹å»·")
+#tmcnæ˜¯å¤§é™¸é–‹ç™¼ï¼Œtmä»¥åŠRwordsegç‚ºè‹±æ–‡çš„
+#stopwordsCNæ‰“åœ¨ä¸‹æ–¹ï¼Œå¯ä»¥çœ‹åˆ°å·²å­˜åœ¨çš„è©(æˆ‘çœ‹ä¸åˆ°Q__Q)
 
 words24 <- tm_map(d.corpus, removeWords, myStopWords)
-#tm_map²M°£¼ĞÂI²Å¸¹
+#tm_mapæ¸…é™¤æ¨™é»ç¬¦è™Ÿ
 words24 <- tm_map(words24, function(word) {gsub("[A-Za-z0-9]", "", word)})
-#²M°£­^¤å¡B¼Æ¦r
+#æ¸…é™¤è‹±æ–‡ã€æ•¸å­—
 words2 <- unlist(words24)
-#Â²¤Æwords24
+#ç°¡åŒ–words24
 words2 <- gsub("[A-z]", "", words2)
 words2 <- words2[nchar(words2) > 1]
-#»İ¦rªø¤j©ó1
+#éœ€å­—é•·å¤§æ–¼1
 table2 <- table(words2)
 wordsDf2 <- data.frame(WORD = names(table2), FREQ = as.vector(table2), stringsAsFactors = FALSE)
 wordsDf2 <- wordsDf2[wordsDf2$FREQ >2, ]
-#»İÀW²v¤j©ó2
+#éœ€é »ç‡å¤§æ–¼2
 pdf(file = "comment2Scorpio.pdf", family = "CNS1")
 wordcloud(wordsDf2$WORD, wordsDf2$FREQ, col = rainbow(length(wordsDf2$FREQ)))
 wordcloud(wordsDf2$WORD, wordsDf2$FREQ,min.freq=5,random.order=F,ordered.colors=F,colors = rainbow(length(wordsDf2$FREQ)))
 dev.off()
 
-####²Ä¥|³¡¤ÀÃöÁp¤ÀªR#######################################################################
-#¥H±M·~PO¤å¸ê®Æ¬°¨Ò#
+####ç¬¬å››éƒ¨åˆ†é—œè¯åˆ†æ#######################################################################
+#ä»¥å°ˆæ¥­POæ–‡è³‡æ–™ç‚ºä¾‹#
 post1 <- read.csv("postScorpio.csv", stringsAsFactors = FALSE)
 post1 <- post1[!is.na(post1$message), ]
-#§R°£ªÅ®æ©ÎªÅ¦æ
-#Â_µü#
+#åˆªé™¤ç©ºæ ¼æˆ–ç©ºè¡Œ
+#æ–·è©#
 d.corpus1<- segmentCN(post1$message)
-d.corpus <- Corpus(VectorSource(d.corpus1 ))#«Øºc¦V¶q¬°¿é¤J·½¡Aºc¦¨¤å³¹
-#¥h°£¤£»İ­nªº¦r#
-myStopWords <- c(stopwordsCN(), "¯uªº","«¢«¢«¢","¤À¨É","¦]¬°", "¤ñ¸û", "³o¼Ë", "¥Ø«e", "©Ò¥H", "Ä±±o","ÅÜ¦¨","³o­Ó","¨S¦³","¤@­Ó","¥ş¤å","¥i¥H","¥L­Ì","25","¤ÀªR","¦Û¤v","³ßÅw","§Ú­Ì","¼w°ê","ªü®Ú§Ê")
+d.corpus <- Corpus(VectorSource(d.corpus1 ))#å»ºæ§‹å‘é‡ç‚ºè¼¸å…¥æºï¼Œæ§‹æˆæ–‡ç« 
+#å»é™¤ä¸éœ€è¦çš„å­—#
+myStopWords <- c(stopwordsCN(), "çœŸçš„","å“ˆå“ˆå“ˆ","åˆ†äº«","å› ç‚º", "æ¯”è¼ƒ", "é€™æ¨£", "ç›®å‰", "æ‰€ä»¥", "è¦ºå¾—","è®Šæˆ","é€™å€‹","æ²’æœ‰","ä¸€å€‹","å…¨æ–‡","å¯ä»¥","ä»–å€‘","25","åˆ†æ","è‡ªå·±","å–œæ­¡","æˆ‘å€‘","å¾·åœ‹","é˜¿æ ¹å»·")
 words24 <- tm_map(d.corpus, removeWords, myStopWords)
-#tm_map²M°£¼ĞÂI²Å¸¹
+#tm_mapæ¸…é™¤æ¨™é»ç¬¦è™Ÿ
 words24 <- tm_map(words24, function(word) {gsub("[A-Za-z0-9]", "", word)})
 
-#ÃöÁp¤ÀªR#
+#é—œè¯åˆ†æ#
 d.vec <- sapply(words24, paste, collapse = " ")
-#Åªword24¶K¤J¥HªÅ®æ¤è¦¡¥h¤Á³Î
+#è®€word24è²¼å…¥ä»¥ç©ºæ ¼æ–¹å¼å»åˆ‡å‰²
 d.vec <- unique(d.vec)
-#¥H³æ¤@§Î¦¡Åª¤Jex.ªü«H¥X²{10¦¸¡A¶Èºâ¤@¦¸
+#ä»¥å–®ä¸€å½¢å¼è®€å…¥ex.é˜¿ä¿¡å‡ºç¾10æ¬¡ï¼Œåƒ…ç®—ä¸€æ¬¡
 d.corpus2 <- Corpus(VectorSource(d.vec))
-#VectorSource¦V¶q¤è¦¡§e²{
+#VectorSourceå‘é‡æ–¹å¼å‘ˆç¾
 d.corpus2
 inspect(d.corpus2[1])
-#³o­Ó«ü¥O¥i¥Hª½±µ±N¬İ·Q±N²Ä´X¦æªº¦r¦C¥X¡A¥´¤W·Q­nªº¦æ´N·|¥X²{¨º¤@¦æªº¦r
+#é€™å€‹æŒ‡ä»¤å¯ä»¥ç›´æ¥å°‡çœ‹æƒ³å°‡ç¬¬å¹¾è¡Œçš„å­—åˆ—å‡ºï¼Œæ‰“ä¸Šæƒ³è¦çš„è¡Œå°±æœƒå‡ºç¾é‚£ä¸€è¡Œçš„å­—
 d.dtm <- DocumentTermMatrix(d.corpus2)
-#±N³B²z«áªºµü®w¶i¦æÂ_¦r³B²z¡A¥Í¦¨µüÀWÅv­«¯x°}¡A¥Í¦¨µü¶³¯x°}¡A³Ì¤jªø«×¬°5
+#å°‡è™•ç†å¾Œçš„è©åº«é€²è¡Œæ–·å­—è™•ç†ï¼Œç”Ÿæˆè©é »æ¬Šé‡çŸ©é™£ï¼Œç”Ÿæˆè©é›²çŸ©é™£ï¼Œæœ€å¤§é•·åº¦ç‚º5
 d.dtm
 findFreqTerms(d.dtm, 1)
 findFreqTerms(d.dtm, 2)
-#§ì¥XÀW²v¶W¹L1¦¸ªÌ
-findAssocs(d.dtm, "¤ÑÃÈ®y", 0.1)
-#¥ÎfindAssocs§ä¥X³Ì±`»P"¤ÑÃÈ®y"ÃöÁpµ{«×¡FÃöÁpµ{«×¬°0.1¥H¤Wªºµü
+#æŠ“å‡ºé »ç‡è¶…é1æ¬¡è€…
+findAssocs(d.dtm, "å¤©è åº§", 0.1)
+#ç”¨findAssocsæ‰¾å‡ºæœ€å¸¸èˆ‡"å¤©è åº§"é—œè¯ç¨‹åº¦ï¼›é—œè¯ç¨‹åº¦ç‚º0.1ä»¥ä¸Šçš„è©
 
-###¥H¤U¥i¥H½Õ¾ã¬ÛÃöµ{«×¡A¨Ã±N¨ä²¾°£¡A¥i¥H¿ï¾Ü¤£°µ###
-#¥Í¦¨ªº¯x°}¬O¤@­Óµ}²¨¯x°}¡A¥i¦A¶i¦æ­°ºû³B²z¡A¤§«áÂà¬°¼Ğ·Ç¼Æ¾Ú®Ø®æ®æ¦¡
-#§Ú­Ì¥i¥H¥h±¼¬Y¨Ç¥X²{ÀW¦¸¤Ó§Cªºµü
+###ä»¥ä¸‹å¯ä»¥èª¿æ•´ç›¸é—œç¨‹åº¦ï¼Œä¸¦å°‡å…¶ç§»é™¤ï¼Œå¯ä»¥é¸æ“‡ä¸åš###
+#ç”Ÿæˆçš„çŸ©é™£æ˜¯ä¸€å€‹ç¨€ç–çŸ©é™£ï¼Œå¯å†é€²è¡Œé™ç¶­è™•ç†ï¼Œä¹‹å¾Œè½‰ç‚ºæ¨™æº–æ•¸æ“šæ¡†æ ¼æ ¼å¼
+#æˆ‘å€‘å¯ä»¥å»æ‰æŸäº›å‡ºç¾é »æ¬¡å¤ªä½çš„è©
 dtm1<- removeSparseTerms(d.dtm, sparse=0.9)
-#²¾°£ÃöÁpµ{«×0.9¥H¤Wªº
+#ç§»é™¤é—œè¯ç¨‹åº¦0.9ä»¥ä¸Šçš„
 inspect(dtm1)
 data <- as.data.frame(inspect(dtm1))
 ####################################################
-#¶}©l°µ¶°¸s#
+#é–‹å§‹åšé›†ç¾¤#
 data <- as.data.frame(inspect(d.dtm))
 data.scale <- scale(data)
-#§âdata°µ¤Ø«×
+#æŠŠdataåšå°ºåº¦
 d <- dist(data.scale, method = "euclidean")
-#¥Î¼Ú°ò¨½±o¶ZÂ÷
+#ç”¨æ­åŸºé‡Œå¾—è·é›¢
 fit <- hclust(d,method="ward")
-#»EÃş¤ÀªR¡AÃ¸»s»EÃş¹Ï
+#èšé¡åˆ†æï¼Œç¹ªè£½èšé¡åœ–
 png(paste("Scorpiotermcluster-1", ".png", sep = ''), width=10, height=10,units="in", res=700)
 plot(fit)
 dev.off()
-plot(fit,labels = FALSE,main ="¤å¥ó»EÃş¤ÀªR")
+plot(fit,labels = FALSE,main ="æ–‡ä»¶èšé¡åˆ†æ")
 plot(fit)
-###¥H¤U¬O§óº}«Gªº¶°¸s¤ÀªR###########################
+###ä»¥ä¸‹æ˜¯æ›´æ¼‚äº®çš„é›†ç¾¤åˆ†æ###########################
 dtm01 <- weightTfIdf(d.dtm)
-N = 0.95 #³o¬O¤°»ò?? 
+N = 0.95 #é€™æ˜¯ä»€éº¼?? 
 dtm02 <- removeSparseTerms(dtm01,N);dtm02
-# ª`·N¡A¬°®i¥Ü¤è«K¡A½Õ¾ãdtm02µü»y¼Æ¶q¬°50  
-tdm = as.TermDocumentMatrix(dtm02)#§R°£¤å¥óµ}¤Öªº¦rµü
+# æ³¨æ„ï¼Œç‚ºå±•ç¤ºæ–¹ä¾¿ï¼Œèª¿æ•´dtm02è©èªæ•¸é‡ç‚º50  
+tdm = as.TermDocumentMatrix(dtm02)#åˆªé™¤æ–‡ä»¶ç¨€å°‘çš„å­—è©
 tdm <- weightTfIdf(tdm)
 mydata.df <- as.data.frame(inspect(tdm))
 mydata.df.scale <- scale(mydata.df)
 d <- dist(mydata.df.scale, method = "euclidean") 
 fit <- hclust(d, method="ward")
 png(paste("Scorpiotermcluster-2", ".png", sep = ''), width=10, height=10,units="in", res=700)
-#¼e«×¡B°ª«×¡B¸ÑªR«×
+#å¯¬åº¦ã€é«˜åº¦ã€è§£æåº¦
 plot(fit) 
 dev.off()
 
-####²Ä¤­³¡¤À¥D¦¨¤À¤ÀªR#######################################################################
-#¥H±M·~PO¤å¸ê®Æ¬°¨Ò#
+####ç¬¬äº”éƒ¨åˆ†ä¸»æˆåˆ†åˆ†æ#######################################################################
+#ä»¥å°ˆæ¥­POæ–‡è³‡æ–™ç‚ºä¾‹#
 post1 <- read.csv("postScorpio.csv", stringsAsFactors = FALSE)
 post1 <- post1[!is.na(post1$message), ]
-#Â_µü#
+#æ–·è©#
 d.corpus1<- segmentCN(post1$message)
-d.corpus <- Corpus(VectorSource(d.corpus1 ))#«Øºc¦V¶q¬°¿é¤J·½¡Aºc¦¨¤å³¹
-#¥h°£¤£»İ­nªº¦r#
-myStopWords <- c(stopwordsCN(), "¯uªº","«¢«¢«¢","¤À¨É","¦]¬°", "¤ñ¸û", "³o¼Ë", "¥Ø«e", "©Ò¥H", "Ä±±o","ÅÜ¦¨","³o­Ó","¨S¦³","¤@­Ó","¤ÑÃÈ®y","ÃÈ¤l","¥ş¤å","¥i¥H","¥L­Ì","25","¤ÀªR","¦Û¤v","³ßÅw","§Ú­Ì","¼w°ê","ªü®Ú§Ê")
+d.corpus <- Corpus(VectorSource(d.corpus1 ))#å»ºæ§‹å‘é‡ç‚ºè¼¸å…¥æºï¼Œæ§‹æˆæ–‡ç« 
+#å»é™¤ä¸éœ€è¦çš„å­—#
+myStopWords <- c(stopwordsCN(), "çœŸçš„","å“ˆå“ˆå“ˆ","åˆ†äº«","å› ç‚º", "æ¯”è¼ƒ", "é€™æ¨£", "ç›®å‰", "æ‰€ä»¥", "è¦ºå¾—","è®Šæˆ","é€™å€‹","æ²’æœ‰","ä¸€å€‹","å¤©è åº§","è å­","å…¨æ–‡","å¯ä»¥","ä»–å€‘","25","åˆ†æ","è‡ªå·±","å–œæ­¡","æˆ‘å€‘","å¾·åœ‹","é˜¿æ ¹å»·")
 words24 <- tm_map(d.corpus, removeWords, myStopWords)
-#tm_map²M°£¼ĞÂI²Å¸¹
+#tm_mapæ¸…é™¤æ¨™é»ç¬¦è™Ÿ
 words24 <- tm_map(words24, function(word) {gsub("[A-Za-z0-9]", "", word)})
 
-#ÃöÁp¤ÀªR#
+#é—œè¯åˆ†æ#
 d.vec <- sapply(words24, paste, collapse = " ")
-#Åªword24¶K¤J¥HªÅ®æ¤è¦¡¥h¤Á³Î
+#è®€word24è²¼å…¥ä»¥ç©ºæ ¼æ–¹å¼å»åˆ‡å‰²
 d.vec <- unique(d.vec)
-#¥H³æ¤@§Î¦¡Åª¤Jex.ªü«H¥X²{10¦¸¡A¶Èºâ¤@¦¸
+#ä»¥å–®ä¸€å½¢å¼è®€å…¥ex.é˜¿ä¿¡å‡ºç¾10æ¬¡ï¼Œåƒ…ç®—ä¸€æ¬¡
 d.corpus2 <- Corpus(VectorSource(d.vec))
-#VectorSource¦V¶q¤è¦¡§e²{
+#VectorSourceå‘é‡æ–¹å¼å‘ˆç¾
 d.corpus2
 inspect(d.corpus2[1])
-#³o­Ó«ü¥O¥i¥Hª½±µ±N¬İ·Q±N²Ä´X¦æªº¦r¦C¥X¡A¥´¤W·Q­nªº¦æ´N·|¥X²{¨º¤@¦æªº¦r
+#é€™å€‹æŒ‡ä»¤å¯ä»¥ç›´æ¥å°‡çœ‹æƒ³å°‡ç¬¬å¹¾è¡Œçš„å­—åˆ—å‡ºï¼Œæ‰“ä¸Šæƒ³è¦çš„è¡Œå°±æœƒå‡ºç¾é‚£ä¸€è¡Œçš„å­—
 d.dtm <- DocumentTermMatrix(d.corpus2)
-#±N³B²z«áªºµü®w¶i¦æÂ_¦r³B²z¡A¥Í¦¨µüÀWÅv­«¯x°}¡A¥Í¦¨µü¶³¯x°}¡A³Ì¤jªø«×¬°5
+#å°‡è™•ç†å¾Œçš„è©åº«é€²è¡Œæ–·å­—è™•ç†ï¼Œç”Ÿæˆè©é »æ¬Šé‡çŸ©é™£ï¼Œç”Ÿæˆè©é›²çŸ©é™£ï¼Œæœ€å¤§é•·åº¦ç‚º5
 d.dtm
 
 
-##°õ¦æ¥D¦¨¤À¤ÀªR
+##åŸ·è¡Œä¸»æˆåˆ†åˆ†æ
 k <- princomp(d.dtm)
 summary(k,loadings =TRUE)
 plot(k$sdev,type="l")
 screeplot(k,npcs=6,type='lines')
 biplot(k)  
-#Âù¼Ğ¹Ï ¶V®g¥X¨Óªºªí¦¡­Ó¼Æ¶V¦h
+#é›™æ¨™åœ– è¶Šå°„å‡ºä¾†çš„è¡¨å¼å€‹æ•¸è¶Šå¤š
 
-#¥H¤U¬O¦Ñ®v¥D¦¨¤À¤ÀªRµ{¦¡½X
+#ä»¥ä¸‹æ˜¯è€å¸«ä¸»æˆåˆ†åˆ†æç¨‹å¼ç¢¼
 ozMat <- TermDocumentMatrix(makeChunks(d.corpus2),list(weighting = weightBin))
-#ÃöÁä¦r¬°¦C¡A¤å¥ó¬O¦æªº¯x°}¡C¼Æ¾Ú¶ô¡AÃäªø50³æ¦ì
+#é—œéµå­—ç‚ºåˆ—ï¼Œæ–‡ä»¶æ˜¯è¡Œçš„çŸ©é™£ã€‚æ•¸æ“šå¡Šï¼Œé‚Šé•·50å–®ä½
 k <- princomp(as.matrix(ozMat), features = 2)
-#°õ¦æ¥D¦¨¤À¤ÀªR
+#åŸ·è¡Œä¸»æˆåˆ†åˆ†æ
 screeplot(k,npcs=6,type='lines')
 summary(k)
 biplot(k)  
-#Âù¼Ğ¹Ï ¶V®g¥X¨Óªºªí¦¡­Ó¼Æ¶V¦h
+#é›™æ¨™åœ– è¶Šå°„å‡ºä¾†çš„è¡¨å¼å€‹æ•¸è¶Šå¤š
